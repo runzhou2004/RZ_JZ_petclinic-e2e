@@ -1,5 +1,6 @@
 package petclinic;
 
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +15,7 @@ class PetAndVisitTest extends BaseTest {
         String ownerLastName = unique("PetOwner");
         String petName = unique("Milo");
         String visitDescription = unique("Checkup");
-        String visitDate = LocalDate.now().toString();
+        String visitDate = LocalDate.now().plusDays(1).toString();
 
         addOwner("Jordan", ownerLastName, "123 Test Street", "Austin", "5551234567");
         addPet(petName);

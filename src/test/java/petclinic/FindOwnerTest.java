@@ -1,5 +1,6 @@
 package petclinic;
 
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
 import org.junit.jupiter.api.Test;
 
@@ -18,8 +19,9 @@ class FindOwnerTest extends BaseTest {
         page.getByRole(AriaRole.BUTTON,
             new com.microsoft.playwright.Page.GetByRoleOptions().setName("Find Owner")).click();
 
-        assertThat(page.getByRole(AriaRole.LINK,
-            new com.microsoft.playwright.Page.GetByRoleOptions().setName("Taylor " + lastName))).isVisible();
+        assertThat(page.getByRole(AriaRole.HEADING,
+            new com.microsoft.playwright.Page.GetByRoleOptions().setName("Owner Information"))).isVisible();
+        assertThat(page.locator("table").first()).containsText("Taylor " + lastName);    
     }
 
     @Test

@@ -1,5 +1,6 @@
 package petclinic;
 
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.APIRequest;
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;

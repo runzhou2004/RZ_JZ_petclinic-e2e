@@ -2,8 +2,10 @@ package petclinic;
 
 import org.junit.jupiter.api.Test;
 
+import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.*;
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
-import com.microsoft.playwright.options.AriaRole;
+import java.util.*;
 
 class OwnerTest extends BaseTest {
 
