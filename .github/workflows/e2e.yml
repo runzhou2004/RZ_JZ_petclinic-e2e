@@ -1,0 +1,57 @@
+name: Playwright E2E
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Playwright tests
+        uses: actions/checkout@v4
+
+      - name: Check out Spring PetClinic
+        uses: actions/checkout@v4
+        with:
+          repository: spring-projects/spring-petclinic
+          ref: main
+          path: spring-petclinic
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Install Chromium
+        run: mvn -B exec:java -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install chromium"
+
+      - name: Start PetClinic
+        run: |
+          echo "PetClinic revision: $(git -C spring-petclinic rev-parse HEAD)"
+          mvn -f spring-petclinic/pom.xml spring-boot:run -Dspring-boot.run.arguments=--server.port=8080 > spring-petclinic.log 2>&1 &
+          for attempt in {1..60}; do
+            if curl --fail --silent http://localhost:8080/ > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat spring-petclinic.log
+          exit 1
+
+      - name: Run browser and API tests
+        run: mvn -B test
+
+      - name: Upload test reports and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-evidence
+          path: |
+            target/surefire-reports/
+            traces/
+            spring-petclinic.log
+          if-no-files-found: warn

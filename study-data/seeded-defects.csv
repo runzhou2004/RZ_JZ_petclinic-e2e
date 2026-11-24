@@ -1,0 +1,1 @@
+defect_id,petclinic_revision,defect_description,expected_behavior,junit_detected,playwright_detected,failing_test,evidence_path,notes

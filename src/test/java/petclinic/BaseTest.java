@@ -3,10 +3,14 @@ package petclinic;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
 import org.junit.jupiter.api.*;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.UUID;
 
 public abstract class BaseTest {
-    static final String BASE_URL = "http://localhost:8080";
+    static final String BASE_URL = System.getProperty("petclinic.baseUrl", "http://localhost:8080");
     static Playwright playwright;
     static Browser browser;
     BrowserContext context;
@@ -26,7 +30,8 @@ public abstract class BaseTest {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
+        Files.createDirectories(Paths.get("traces"));
         context = browser.newContext();
         context.tracing().start(new Tracing.StartOptions()
             .setScreenshots(true).setSnapshots(true).setSources(true));
@@ -44,7 +49,7 @@ public abstract class BaseTest {
 
     // Helper: reused by several tests
     void addOwner(String first, String last, String address, String city, String phone) {
-        page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Find Owners")).click();
+        page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Find owners")).click();
         page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Add Owner")).click();
         page.getByLabel("First Name").fill(first);
         page.getByLabel("Last Name").fill(last);
@@ -52,5 +57,17 @@ public abstract class BaseTest {
         page.getByLabel("City").fill(city);
         page.getByLabel("Telephone").fill(phone);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Add Owner")).click();
+    }
+
+    String unique(String prefix) {
+        return prefix + UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    void addPet(String name) {
+        page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Add New Pet")).click();
+        page.getByLabel("Name").fill(name);
+        page.getByLabel("Birth Date").fill(LocalDate.now().minusYears(2).toString());
+        page.getByLabel("Type").selectOption("cat");
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Add Pet")).click();
     }
 }
